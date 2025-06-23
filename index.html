@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CertiGen - Automatic Certificate Generator</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <!-- PapaParse CDN for CSV parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">Certi<span>Gen</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#generator">Generator</a></li>
+                    <li><a href="#templates">Templates</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Create Professional Certificates in Minutes</h1>
+            <p>Our automatic certificate generator makes it easy to design, customize, and distribute beautiful certificates for any occasion.</p>
+        </div>
+    </section>
+
+    <section class="main-content">
+        <div class="container">
+            <h2 class="section-title" id="generator">Certificate Generator</h2>
+            <div class="generator-container">
+                <div class="template-selector">
+                    <h3>Choose a Template</h3>
+                    <div class="template-preview" id="templatePreview">
+                        <canvas id="certificateCanvas" width="800" height="600"></canvas>
+                    </div>
+
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Drag & Drop your template here</p>
+                        <p>or</p>
+                        <button class="btn" style="padding: 8px 15px;" id="browseTemplateBtn">Browse Files</button>
+                        <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+                    </div>
+
+                    <h3 style="margin-top: 30px;">Import Recipients (CSV)</h3>
+                    <div style="margin-bottom: 20px;">
+                      <input type="file" id="csvInput" accept=".csv" />
+                      <p style="font-size: 0.9em; color: #666; margin-top: 5px;">
+                        CSV must have a header row with <code>recipientName</code> column.
+                      </p>
+                    </div>
+
+                    <h3 style="margin-top: 20px;">Sample Templates</h3>
+                    <div class="template-options">
+                        <div class="template-thumbnail active" data-template="classic">
+                            <img src="https://th.bing.com/th/id/OIP.wsHIZd0TVznfIGT47jAd5QHaEv?cb=iwc2&rs=1&pid=ImgDetMain" alt="Classic Template" />
+                        </div>
+                        <div class="template-thumbnail" data-template="modern">
+                            <img src="https://th.bing.com/th/id/OIP.j5GHe7exVULloQhtDj_0VgHaHa?cb=iwc2&rs=1&pid=ImgDetMain" alt="Modern Template" />
+                        </div>
+                        <div class="template-thumbnail" data-template="elegant">
+                            <img src="https://th.bing.com/th/id/OIP.uzc_8Y8coUxDb-31vGVZugHaGG?cb=iwc2&rs=1&pid=ImgDetMain" alt="Elegant Template" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="customizer">
+                    <h3>Customize Your Certificate</h3>
+                    <form id="certificateForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="recipientName">Recipient Name</label>
+                                <input
+                                  type="text"
+                                  id="recipientName"
+                                  placeholder="Enter recipient's name"
+                                  required
+                                />
+                            </div>
+                            <div class="form-group">
+                                <label for="courseTitle">Course/Event Title</label>
+                                <input
+                                  type="text"
+                                  id="courseTitle"
+                                  placeholder="Enter course/event title"
+                                  required
+                                />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="certificateText">Certificate Text</label>
+                            <textarea
+                              id="certificateText"
+                              placeholder="This certificate is proudly presented to [Name] for successfully completing [Course] on [Date]."
+                              required
+                            ></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="date">Date</label>
+                                <input type="date" id="date" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="signature">Signature</label>
+                                <select id="signature">
+                                    <option value="">No signature</option>
+                                    <option value="signature1">CEO Signature</option>
+                                    <option value="signature2">Director Signature</option>
+                                    <option value="custom">Upload your own</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="textColor">Text Color</label>
+                                <input type="color" id="textColor" value="#000000" />
+                            </div>
+                            <div class="form-group">
+                                <label for="bgColor">Background Color</label>
+                                <input type="color" id="bgColor" value="#FFFFFF" />
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fontFamily">Font Family</label>
+                                <select id="fontFamily">
+                                    <option value="Arial, sans-serif">Arial</option>
+                                    <option value="Times New Roman, serif">Times New Roman</option>
+                                    <option value="Courier New, monospace">Courier New</option>
+                                    <option value="Georgia, serif" selected>Georgia</option>
+                                    <option value="Palatino, serif">Palatino</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="fontSize">Font Size</label>
+                                <select id="fontSize">
+                                    <option value="16px">Small</option>
+                                    <option value="20px" selected>Medium</option>
+                                    <option value="24px">Large</option>
+                                    <option value="28px">Extra Large</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn">Generate Certificate</button>
+                        <button
+                          type="button"
+                          id="downloadBtn"
+                          class="btn"
+                          style="background-color: #6c757d; margin-left: 10px;"
+                        >
+                          Download Certificate
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="templates-section">
+        <div class="container">
+            <h2 class="section-title" id="templates">Sample Templates</h2>
+            <div class="templates-grid">
+                <div class="template-card">
+                    <div class="template-card-img">
+                        <img
+                          src="https://th.bing.com/th/id/OIP.uzc_8Y8coUxDb-31vGVZugHaGG?cb=iwc2&rs=1&pid=ImgDetMain"
+                          alt="Academic Template"
+                        />
+                    </div>
+                    <div class="template-card-body">
+                        <h3 class="template-card-title">Academic Excellence</h3>
+                        <p class="template-card-desc">
+                          Perfect for schools and universities recognizing student achievements.
+                        </p>
+                        <button
+                          class="btn use-template-btn"
+                          data-template="academic"
+                          style="padding: 8px 15px;"
+                        >
+                          Use This Template
+                        </button>
+                    </div>
+                </div>
+
+                <div class="template-card">
+                    <div class="template-card-img">
+                        <img
+                          src="https://th.bing.com/th/id/OIP.2Cnwalj1l208HgG5mvsbigHaFi?cb=iwc2&rs=1&pid=ImgDetMain"
+                          alt="Corporate Template"
+                        />
+                    </div>
+                    <div class="template-card-body">
+                        <h3 class="template-card-title">Corporate Training</h3>
+                        <p class="template-card-desc">
+                          Professional design for employee training and development programs.
+                        </p>
+                        <button
+                          class="btn use-template-btn"
+                          data-template="corporate"
+                          style="padding: 8px 15px;"
+                        >
+                          Use This Template
+                        </button>
+                    </div>
+                </div>
+
+                <div class="template-card">
+                    <div class="template-card-img">
+                        <img
+                          src="https://th.bing.com/th/id/OIP.2Cnwalj1l208HgG5mvsbigHaFi?cb=iwc2&rs=1&pid=ImgDetMain"
+                          alt="Event Template"
+                        />
+                    </div>
+                    <div class="template-card-body">
+                        <h3 class="template-card-title">Event Participation</h3>
+                        <p class="template-card-desc">
+                          Elegant design for conferences, workshops, and special events.
+                        </p>
+                        <button
+                          class="btn use-template-btn"
+                          data-template="event"
+                          style="padding: 8px 15px;"
+                        >
+                          Use This Template
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>CertiGen</h3>
+                    <p>Making certificate creation simple and efficient for organizations of all sizes.</p>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#generator">Generator</a></li>
+                        <li><a href="#templates">Templates</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#faq">FAQ</a></li>
+                        <li><a href="#contact">Contact Us</a></li>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> info@certigen.com</li>
+                        <li><i class="fas fa-phone"></i> (123) 456-7890</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Certi St, Template City</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 CertiGen. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <script>
+      // Show file browser on clicking 'Browse Files' button for template upload
+      document.getElementById("browseTemplateBtn").addEventListener("click", () => {
+        document.getElementById("fileInput").click();
+      });
+
+      // CSV input handling with PapaParse
+      document.getElementById("csvInput").addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        Papa.parse(file, {
+          header: true,
+          skipEmptyLines: true,
+          complete: function (results) {
+            if (!results.data || results.data.length === 0) {
+              alert("CSV file is empty or invalid");
+              return;
+            }
+
+            // Use first row only, you can extend for multiple rows
+            const firstRow = results.data[0];
+            if (!firstRow.recipientName) {
+              alert('CSV must have a column named "recipientName"');
+              return;
+            }
+
+            // Fill fields with CSV and fixed values
+            document.getElementById("recipientName").value = firstRow.recipientName;
+            document.getElementById("courseTitle").value = "WORKSHOP '25";
+            document.getElementById(
+              "certificateText"
+            ).value = "In recognition of active participation and accomplishment in the Workshop'25";
+
+            // Optionally set date to today
+            document.getElementById("date").value = new Date().toISOString().slice(0, 10);
+
+            alert(`Loaded certificate info for ${firstRow.recipientName} from CSV.`);
+          },
+          error: function (err) {
+            alert("Error reading CSV file: " + err.message);
+          },
+        });
+      });
+    </script>
+</body>
+</html> 
